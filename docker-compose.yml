@@ -1,0 +1,48 @@
+version: '2'
+services:
+    nginx:
+        image: tutum/nginx
+        restart: always
+        ports:
+            - 127.0.0.1:8010:80
+        links:
+            - phpfpm
+        volumes:
+            - ./nginx/default:/etc/nginx/sites-available/default
+            - ./nginx/default:/etc/nginx/sites-enabled/default
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./html:/var/html
+    phpfpm:
+        build: ./php/.
+        restart: always
+        links:
+            - db
+        volumes:
+            - ./html:/var/html
+    db:
+        image: mariadb
+        restart: always
+        env_file:
+            - .env
+        volumes:
+            - ./mariadb:/var/lib/mysql
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        links:
+            - db
+        ports:
+            - 127.0.0.1:8011:80
+        environment:
+            PMA_ARBITRARY: 0
+    ftp:
+        image: stilliard/pure-ftpd
+        restart: always
+        ports: 
+            - 127.0.0.1:8012:21
+        env_file:
+            - .env
+        environment:
+            FTP_USER_HOME: /root
+        volumes:
+            - ./html:/root

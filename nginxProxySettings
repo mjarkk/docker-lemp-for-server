@@ -1,0 +1,49 @@
+server {
+	listen 80;
+	listen [::]:80;
+	server_name <<SERVER>>;
+	return 301 https://$host$request_uri;
+}
+
+server {
+  include error-location.inc;
+  add_header X-Frame-Options ALLOWALL;
+  listen 443 ssl http2;
+  server_name <<SERVER>>;
+  ssl on;
+  ssl_certificate /etc/letsencrypt/live/<<SERVER>>/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/<<SERVER>>/privkey.pem;
+  location / {
+    proxy_pass http://127.0.0.1:8010/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+  }
+}
+
+server {
+	listen 81;
+	listen [::]:81;
+	server_name <<SERVER>>;
+	return 301 https://$host$request_uri;
+}
+
+server {
+  include error-location.inc;
+  add_header X-Frame-Options ALLOWALL;
+  listen 81 ssl http2;
+  server_name <<SERVER>>;
+  ssl on;
+  ssl_certificate /etc/letsencrypt/live/<<SERVER>>/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/<<SERVER>>/privkey.pem;
+  location / {
+    proxy_pass http://127.0.0.1:8011/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+  }
+}
