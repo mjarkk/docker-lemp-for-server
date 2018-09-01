@@ -3,7 +3,16 @@
 if [ -z "$DOMAIN" ]
 then
   echo "the \$DOMAIN variable is not set."
-  echo "use DOMAIN=www.some-domain.com ./rebuild"
+  echo "add to the command: DOMAIN=www.some-domain.com ./rebuild"
+  echo ""
+  exit
+fi
+
+if [ -z "$PORT" ]
+then
+  echo "the \$PORT variable is not set."
+  echo "add to the command: PORT=808 ./rebuild"
+  echo "the specified server number will be added to the PORT like web=8081 and phpmyadmin=8082"
   echo ""
   exit
 fi
@@ -17,6 +26,7 @@ sudo chmod 777 html -R
 # write webserver files
 cp nginxProxySettings "/etc/nginx/sites-enabled/$DOMAIN"
 sed -i "s/<<SERVER>>/$DOMAIN/g" "/etc/nginx/sites-enabled/$DOMAIN"
+sed -i "s/<<PORT>>/$PORT/g" "/etc/nginx/sites-enabled/$DOMAIN"
 
 # stop nginx
 sudo systemctl stop nginx
